@@ -33,6 +33,9 @@ WORKDIR /app
 ENV PYTHONDONWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Actualizar setuptools/wheel del sistema base (corrige CVEs)
+RUN pip install --no-cache-dir --upgrade setuptools wheel
+
 # Creamos un usuario y un grupo de sistemas sin privilegios non-root.
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
