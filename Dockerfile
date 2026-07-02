@@ -14,9 +14,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-#Actualizar pip/setuptools/wheel para corregir vulnerabilidades
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel
-
 #Copiar solo los requisitos para aprovechas la cache de capas de docker
 COPY requirements.txt .
 
@@ -32,9 +29,6 @@ WORKDIR /app
 
 ENV PYTHONDONWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-
-# Actualizar setuptools/wheel del sistema base (corrige CVEs)
-RUN pip install --no-cache-dir --upgrade setuptools wheel
 
 # Creamos un usuario y un grupo de sistemas sin privilegios non-root.
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
