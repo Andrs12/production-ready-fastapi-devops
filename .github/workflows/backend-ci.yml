@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Escanear repositorio (FS) con Trivy
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -76,7 +76,7 @@ jobs:
 
       # Pasamos Trivy pero esta vez apuntando a la IMAGEN CONTAINERizada, no a los archivos sueltos
       - name: Escanear Imagen Docker con Trivy
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'image'
           image-ref: 'backend-api:local'
