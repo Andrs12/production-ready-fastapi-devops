@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
+#Actualizar pip/setuptools/wheel para corregir vulnerabilidades
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
 #Copiar solo los requisitos para aprovechas la cache de capas de docker
 COPY requirements.txt .
 
