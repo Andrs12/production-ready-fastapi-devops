@@ -1,36 +1,35 @@
 name: Backend Production CI/CD
 
-on: 
+on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-# CALIDAD DEL CODIGO Y TESTS UNITARIOS
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
 
-test-and-lint:
-  runs-on: ubuntu-latest
-  steps: 
-    - name: Checkout del codigo
-      uses: actions/checkout@v4
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
 
-    - name: Configurar Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-        cache: 'pip'
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8
 
-    - name: Instalar dependencias
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest httpx fastapi 
+      - name: Ejecutar Linter (Flake8)
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    - name: Ejecutar Linter (Flake8)
-      run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
-    - name: Ejecutar Test con pytest
-      run: |
-        pytest -v
+      - name: Ejecutar Test con pytest
+        run: |
+          pytest -v
