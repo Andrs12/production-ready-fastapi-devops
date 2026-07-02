@@ -1,16 +1,18 @@
 import os
+import uvicorn
+
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
-
-load_dotenv(Path(__file__).parent / ".env")
-
-import uvicorn
 from fastapi import FastAPI
 
 from database import engine, Base
 from routers import items, health
+
+load_dotenv(Path(__file__).parent / ".env")
+
+
 
 
 @asynccontextmanager

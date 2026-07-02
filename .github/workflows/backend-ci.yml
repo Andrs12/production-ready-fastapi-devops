@@ -33,3 +33,54 @@ jobs:
       - name: Ejecutar Test con pytest
         run: |
           pytest -v
+
+  security-scan:
+    needs: test-and-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Escanear repositorio (FS) con Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true 
+          severity: 'CRITICAL,HIGH'
+
+  docker-build:
+    needs: security-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      # Setup Buildx es obligatorio para poder usar las funciones avanzadas de caché (gha)
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Construimos la imagen LOCALMENTE primero para que Trivy pueda escanearla por dentro
+      - name: Construir imagen Docker (Local)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false 
+          tags: backend-api:local
+          load: true # Esto inyecta la imagen directamente en el demonio Docker del Runner de GitHub
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Pasamos Trivy pero esta vez apuntando a la IMAGEN CONTAINERizada, no a los archivos sueltos
+      - name: Escanear Imagen Docker con Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          image-ref: 'backend-api:local'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
